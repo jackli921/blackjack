@@ -2,52 +2,71 @@
 
 public class Game
 {
-    private List<Player> players;
-    private Deck deck;
+    private readonly Deck deck = new Deck();
+    private readonly Player player;
+    private readonly Dealer dealer = new Dealer();
 
-    public Game()
+    public Game(Player player)
     {
-        players = new List<Player>
-        {
-            new Player("Player 1", false),
-            new Player("Dealer", true)
-        };
-        deck = new Deck();
-        deck.Shuffle();
+        this.player = player;
     }
 
-    public void StartGame()
+    public Player GetPlayer() => player;
+    public Dealer GetDealer() => dealer;
+    public void StartNewRound()
     {
-        DealInitialCards();
-        foreach (Player player in players)
-        {
-            if (!player.IsDealer)
-            {
-                // add player interaction logic 
-            }
-        }
-        foreach (Player player in players.Where(p => p.IsDealer))
-        {
-            player.TakeTurn(deck);
-        }
-        this.CheckForWinners();
+        deck.Reset();
+        deck.Shuffle();
+        
+        player.Hand.Clear();
+        dealer.Hand.Clear();
+        
+        this.DealInitialCards();
     }
 
     private void DealInitialCards()
     {
-        foreach (Player player in players)
+        player.Hit(deck.DrawCard());
+        dealer.Hit(deck.DrawCard());
+        player.Hit(deck.DrawCard());
+        dealer.Hit(deck.DrawCard());
+    }
+
+    public void PlayerTurn(bool wantsToHit)
+    {
+        if (wantsToHit)
         {
-            player.Hand.AddCard(deck.Draw());
-            player.Hand.AddCard(deck.Draw());
+            player.Hit(deck.DrawCard());
+        }
+        else
+        {
+            player.Stand();
         }
     }
 
-    private void CheckForWinners()
+    public void DealerTurn()
     {
-        foreach (Player player in players)
+        dealer.RevealHiddenCard();
+
+        while (dealer.Hand.Total < 17)
         {
-            Console.WriteLine($"{player.Name} has {player.Hand} with a value of {player.Hand.CalculateValue()}");
+            dealer.Hit(deck.DrawCard());
         }
-        
+    }
+
+    public string DetermineWinner()
+    {
+        if (player.Hand.IsBusted())
+            return "Dealer wins!";
+
+        if (dealer.Hand.IsBusted() || player.Hand.Total > dealer.Hand.Total)
+        {
+            return "Player wins!";
+        }
+
+        if (player.Hand.Total < dealer.Hand.Total)
+            return "Dealer wins!";
+
+        return "It's a tie;";
     }
 }

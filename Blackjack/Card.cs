@@ -9,7 +9,7 @@ public enum Suit
     Spades
 }
 
-public enum Value
+public enum Rank
 {
     Two = 2,
     Three,
@@ -20,25 +20,27 @@ public enum Value
     Eight,
     Nine,
     Ten,
-    Jack = 10,
-    Queen = 10,
-    King = 10,
-    Ace = 11
+    Jack, 
+    Queen,
+    King,
+    Ace
 }
 
 public class Card
 {
     public Suit Suit { get; private set; }
-    public Value Value { get; private set; }
+    public Rank Rank { get; private set; }
 
-    public Card(Suit suit, Value value)
+    public int Value => Rank <= Rank.Ten ? (int)Rank : (Rank == Rank.Ace ? 11 : 10);
+
+    public Card(Suit suit, Rank rank)
     {
         Suit = suit;
-        Value = value;
+        Rank = rank;
     }
 
     public override string ToString()
     {
-        return $"{Value} of {Suit}";
+        return $"{Rank} of {Suit}";
     }
 }

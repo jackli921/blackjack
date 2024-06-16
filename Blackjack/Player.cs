@@ -4,25 +4,42 @@ public class Player
 {
     public string Name { get; private set; }
     public Hand Hand { get; private set; }
-    public bool IsDealer { get; private set; }
+
+    public Player(string name)
+    {
+        Name = name;
+        Hand = new Hand();
+    }
 
     public virtual void Hit(Card card) => Hand.AddCard(card);
 
     public virtual void Stand() => Console.WriteLine($"Player: {Name} chose to stand.");
+}
 
-    public Player(string name, bool isDealer)
+public class Dealer : Player
+{
+    public Dealer(): base("Dealer"){}
+    
+    public Card? HiddenCard { get; private set; }
+
+    public override void Hit(Card card)
     {
-        Name = name;
-        Hand = new Hand();
-        IsDealer = isDealer;
-
+        if (HiddenCard == null)
+        {
+            HiddenCard = card;
+        }
+        else
+        {
+            base.Hit(card);
+        }
     }
 
-    public void TakeTurn(Deck deck)
+    public void RevealHiddenCard()
     {
-        while (Hand.CalculateValue() < 17)
+        if (HiddenCard != null)
         {
-            Hand.AddCard(deck.Draw());
+            Hand.AddCard(HiddenCard);
+            HiddenCard = null;
         }
     }
 }

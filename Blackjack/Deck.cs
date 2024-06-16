@@ -2,18 +2,11 @@
 
 public class Deck
 {
-    private List<Card> _cards;
-
+    private List<Card> _cards = new List<Card>();
+    private readonly Random random = new Random();
     public Deck()
     {
-        _cards = new List<Card>();
         this.Reset();
-    }
-
-    public void Shuffle()
-    {
-        Random rng = new Random();
-        _cards = _cards.OrderBy(c => rng.Next()).ToList();
     }
 
     public void Reset()
@@ -21,18 +14,23 @@ public class Deck
         _cards.Clear();
         foreach (Suit suit in Enum.GetValues(typeof(Suit)))
         {
-            foreach (Value value in Enum.GetValues(typeof(Value)))
+            foreach (Rank value in Enum.GetValues(typeof(Rank)))
             {
                 _cards.Add(new Card(suit, value));
             }
         }
     }
+
+    public void Shuffle()
+    {
+        _cards = _cards.OrderBy(c => random.Next()).ToList();
+    }
     
-    public Card Draw()
+    public Card DrawCard()
     {
         if (_cards.Count == 0) throw new InvalidOperationException("Deck is empty.");
-        Card card = _cards[0];
-        _cards.RemoveAt(0);
+        Card card = _cards[^1];
+        _cards.RemoveAt(_cards.Count - 1);
         return card;
     }
 }
